@@ -20,13 +20,15 @@ for col in df.columns[6:]:
     if df[col].dtype == 'object':
         df[col] = df[col].str.replace(',', '.').astype(float)
 
+# Add the NLR column (dividing the number of neutrophils by the number of lymphocytes)
+df['NLR'] = df['neutrophils count'] / df['lymphocyte count']
+
 # Get all columns from the research
 # Missing cardiac and lung values
 # ALT = glutamic-pyruvic transaminase
-# Toevoegen van NLR (neutrophil count/lymphocyte count)
 X = df[['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
         'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
-        'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin']]
+        'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR']]
 y = df['outcome']
 
 # Impute missing values
@@ -51,4 +53,4 @@ kf = KFold(n_splits=5, shuffle=True, random_state=41)
 # Decision Tree
 dt_scores = cross_val_score(dt_model, X_imputed, y, cv=kf)
 print("Decision Tree Cross-validation scores:", dt_scores)
-print("Decision Tree Mean Accuracy:", dt_scores.mean())
+print("Decision Tree Mean Accuracy Semiz:", dt_scores.mean())
