@@ -41,7 +41,7 @@ X_scaled = scaler.fit_transform(X_imputed)
 num_neurons_layer1 = 64
 num_neurons_layer2 = 32
 learning_rate = 0.005
-batch_size = 64
+batch_size = 30
 num_epochs = 50
 
 # Define K-fold cross-validation
@@ -57,8 +57,8 @@ for train_index, test_index in kf.split(X_scaled):
 
     # Build the neural network model
     model = tf.keras.Sequential([
-        tf.keras.layers.Dense(num_neurons_layer1, activation='relu', input_shape=(3,)),
-        tf.keras.layers.Dense(num_neurons_layer2, activation='relu'),
+        tf.keras.layers.Dense(num_neurons_layer1, activation='elu', input_shape=(3,)),
+        tf.keras.layers.Dense(num_neurons_layer2, activation='elu'),
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
 
@@ -76,4 +76,4 @@ for train_index, test_index in kf.split(X_scaled):
 
 # Calculate and print mean cross-validation score
 mean_cv_score = np.mean(cv_scores)
-print('Mean cross-validation accuracy:', mean_cv_score)
+print('Mean cross-validation accuracy Neural Network Zhao:', mean_cv_score)
