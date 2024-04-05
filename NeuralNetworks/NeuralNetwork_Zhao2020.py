@@ -57,8 +57,8 @@ for train_index, test_index in kf.split(X_scaled):
 
     # Build the neural network model
     model = tf.keras.Sequential([
-        tf.keras.layers.Dense(num_neurons_layer1, activation='elu', input_shape=(3,)),
-        tf.keras.layers.Dense(num_neurons_layer2, activation='elu'),
+        tf.keras.layers.Dense(num_neurons_layer1, activation='relu', input_shape=(3,)),
+        tf.keras.layers.Dense(num_neurons_layer2, activation='relu'),
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
 
