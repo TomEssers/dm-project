@@ -20,15 +20,8 @@ for col in data.columns[6:]:
     if data[col].dtype == 'object':
         data[col] = data[col].str.replace(',', '.').astype(float)
 
-# Add the NLR column (dividing the number of neutrophils by the number of lymphocytes)
-data['NLR'] = data['neutrophils count'] / data['lymphocyte count']
-
-# Get all columns from the research
-# Missing cardiac and lung values
-# ALT = glutamic-pyruvic transaminase
-X = data[['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
-        'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
-        'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR']]
+# Split features and target
+X = data[['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte']]
 y = data['outcome']
 
 # Reset index of y to match X
@@ -61,7 +54,7 @@ cv_auc = []
 
 # Build the neural network model
 model = tf.keras.Sequential([
-    tf.keras.layers.Input(shape=(13,)),
+    tf.keras.layers.Input(shape=(3,)),
     tf.keras.layers.Dense(num_neurons_layer1, activation='relu'),
     tf.keras.layers.Dense(num_neurons_layer2, activation='relu'),
     tf.keras.layers.Dense(1, activation='sigmoid')

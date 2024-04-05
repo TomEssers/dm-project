@@ -19,9 +19,6 @@ for col in data.columns[6:]:
     if data[col].dtype == 'object':
         data[col] = data[col].str.replace(',', '.').astype(float)
 
-# Add the NLR column (dividing the number of neutrophils by the number of lymphocytes)
-data['NLR'] = data['neutrophils count'] / data['lymphocyte count']
-
 # Split features and target
 X = data[['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte']]
 y = data['outcome']
