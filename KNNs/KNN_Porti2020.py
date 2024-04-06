@@ -20,8 +20,11 @@ for col in data.columns[6:]:
     if data[col].dtype == 'object':
         data[col] = data[col].str.replace(',', '.').astype(float)
 
-# Split features and target
-X = data[['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte']]
+# Add the NLR column (dividing the number of neutrophils by the number of lymphocytes)
+data['NLR'] = data['neutrophils count'] / data['lymphocyte count']
+
+# Get only the biomarkers that were used in the Ponti 2020 research
+X = data[['lymphocyte count', 'neutrophils count', 'Hypersensitive c-reactive protein', 'ESR', 'Interleukin 6', 'D-D dimer', 'NLR']]
 y = data['outcome']
 
 # Reset index of y to match X
@@ -35,8 +38,8 @@ X_imputed = imputer.fit_transform(X)
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X_imputed)
 
-# Initialize KNN classifier with k=19
-classifier = KNeighborsClassifier(n_neighbors=19, metric='minkowski', p=2)
+# Initialize KNN classifier
+classifier = KNeighborsClassifier(n_neighbors=17, metric='minkowski', p=2)
 
 # Initialize KFold
 kf = KFold(n_splits=5, shuffle=True, random_state=10)

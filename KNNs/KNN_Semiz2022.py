@@ -20,8 +20,15 @@ for col in data.columns[6:]:
     if data[col].dtype == 'object':
         data[col] = data[col].str.replace(',', '.').astype(float)
 
-# Split features and target
-X = data[['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte']]
+# Add the NLR column (dividing the number of neutrophils by the number of lymphocytes)
+data['NLR'] = data['neutrophils count'] / data['lymphocyte count']
+
+# Get all columns from the research
+# Missing cardiac and lung values
+# ALT = glutamic-pyruvic transaminase
+X = data[['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
+        'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
+        'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR']]
 y = data['outcome']
 
 # Reset index of y to match X
@@ -35,8 +42,8 @@ X_imputed = imputer.fit_transform(X)
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X_imputed)
 
-# Initialize KNN classifier with k=19
-classifier = KNeighborsClassifier(n_neighbors=19, metric='minkowski', p=2)
+# Initialize KNN classifier
+classifier = KNeighborsClassifier(n_neighbors=21, metric='minkowski', p=2)
 
 # Initialize KFold
 kf = KFold(n_splits=5, shuffle=True, random_state=10)
