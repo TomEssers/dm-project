@@ -1,10 +1,9 @@
-import pandas as pd
 import numpy as np
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 import tensorflow as tf
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 def neural_network(data, biomarkers):
 
