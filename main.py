@@ -1,4 +1,5 @@
 from NeuralNetworks.NeuralNetwork import neural_network
+from XgBoostDecisionTree.XgBoostDecisionTree import xgboost
 import pandas as pd
 import numpy as np
 
@@ -29,6 +30,15 @@ neural_network_semiz_values = neural_network(data=data, biomarkers=['Hypersensit
 
 neural_network_zhao_values = neural_network(data=data, biomarkers=['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte'])
 
+# Get all XgBoost (decision trees) values
+xgboost_ponti_values = xgboost(data=data, biomarkers=['lymphocyte count', 'neutrophils count', 
+                                                                   'Hypersensitive c-reactive protein', 'ESR', 'Interleukin 6', 'D-D dimer', 'NLR'])
+
+xgboost_semiz_values = xgboost(data=data, biomarkers=['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
+        'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
+        'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR'])
+
+xgboost_zhao_values = xgboost(data=data, biomarkers=['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte'])
 
 print("ponti_neural_network:")
 print(neural_network_ponti_values)
@@ -36,3 +46,9 @@ print("semiz_neural_network:")
 print(neural_network_semiz_values)
 print("zhao_neural_network:")
 print(neural_network_zhao_values)
+print("ponti_xgboost:")
+print(xgboost_ponti_values)
+print("semiz_xgboost:")
+print(xgboost_semiz_values)
+print("zhao_xgboost:")
+print(xgboost_zhao_values)
