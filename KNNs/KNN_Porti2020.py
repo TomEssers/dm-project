@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.impute import SimpleImputer
 
