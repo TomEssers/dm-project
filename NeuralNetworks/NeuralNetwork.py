@@ -7,8 +7,12 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 def neural_network(data, biomarkers):
 
-    # Get only the biomarkers passed as a parameter
-    X = data[biomarkers]
+    # Get only columns needed from biomarker selection, if it is all, take all columns except the ones needed
+    if biomarkers == "all":
+        X = np.concatenate([data.iloc[:, [1, 2]].values, data.iloc[:, 6:]], axis=1)
+    else:
+        X = data[biomarkers]
+
     y = data['outcome']
 
     # Reset index of y to match X
