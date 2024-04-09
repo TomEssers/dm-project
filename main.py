@@ -1,6 +1,7 @@
 from NeuralNetworks.NeuralNetwork import neural_network
 from XgBoostDecisionTree.XgBoostDecisionTree import xgboost
 from LogisticRegressions.LogisticRegression import logistic_regression
+from KNN.KNN import knn
 import pandas as pd
 import numpy as np
 
@@ -53,6 +54,31 @@ def run_logistic_regressions(data, csv_path):
 
         # Save the results to the CSV
 
+def run_knn(data, csv_path):
+
+        # Run logistic regression 3 times
+        knn_ponti_values = knn(data=data, biomarkers=['lymphocyte count', 'neutrophils count', 
+                                                                        'Hypersensitive c-reactive protein', 'ESR', 'Interleukin 6', 'D-D dimer', 'NLR'])
+
+        knn_semiz_values = knn(data=data, biomarkers=['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
+                'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
+                'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR'])
+
+        knn_zhao_values = knn(data=data, biomarkers=['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte'])
+
+        knn_all_values = knn(data=data, biomarkers="all")
+
+        # To be removed print results
+        print("ponti knn:")
+        print(knn_ponti_values)
+        print("semiz knn:")
+        print(knn_semiz_values)
+        print("zhao knn:")
+        print(knn_zhao_values)
+        print("all knn:")
+        print(knn_all_values)
+
+        # Save the results to the CSV
 
 def run_neural_networks(data, csv_path):
         # Get all Logistic Regression values
@@ -111,7 +137,8 @@ if __name__ == "__main__":
         
         # Create a new CSV file for the results
         
-        # Perform all of the data mining methods
+        Perform all of the data mining methods
         run_logistic_regressions(data=data, csv_path=None)
         run_neural_networks(data=data, csv_path=None)
         run_xgboosts(data=data, csv_path=None)
+        run_knn(data=data, csv_path=None)
