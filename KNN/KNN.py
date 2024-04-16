@@ -5,7 +5,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.impute import SimpleImputer
 
-def knn(data, biomarkers, knn_k_amount, kfold_amount, name):
+def knn(data, biomarkers, knn_k_amount):
 
     # Get only columns needed from biomarker selection, if it is all, take all columns except the ones needed
     if biomarkers == "all":
@@ -30,7 +30,7 @@ def knn(data, biomarkers, knn_k_amount, kfold_amount, name):
     classifier = KNeighborsClassifier(n_neighbors=knn_k_amount, metric='minkowski', p=2)
 
     # Initialize KFold
-    kf = KFold(n_splits=kfold_amount, shuffle=True)
+    kf = KFold(n_splits=10, shuffle=True)
 
     # Perform k-fold cross-validation manually
     cv_scores_acc = cross_val_score(classifier, X_scaled, y, cv=kf, scoring='accuracy')
@@ -47,4 +47,4 @@ def knn(data, biomarkers, knn_k_amount, kfold_amount, name):
     mean_auc = np.mean(cv_scores_auc)
     
     # Return accuracy, precision, recall, f1-score, and AUC
-    return mean_precision, mean_recall
+    return mean_acc, mean_precision, mean_recall, mean_f1, mean_auc

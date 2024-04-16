@@ -1,157 +1,113 @@
+import pandas as pd
+import numpy as np
+from DecisionTrees.DecisionTree import decision_tree
 from NeuralNetworks.NeuralNetwork import neural_network
 from XgBoostDecisionTree.XgBoostDecisionTree import xgboost
 from LogisticRegressions.LogisticRegression import logistic_regression
 from KNN.KNN import knn
-import pandas as pd
-import numpy as np
 
 
 def prepare_data(path):
-        # Load the dataset
-        data = pd.read_csv(path, delimiter=';')
+    # Load the dataset
+    data = pd.read_csv(path, delimiter=';')
 
-        # Replace all empty values with NaN
-        data = data.replace('None', np.NaN)
+    # Replace all empty values with NaN
+    data = data.replace('None', np.NaN)
 
-        # Group by id and take the latest non NaN value
-        data = data.groupby('id').last()
+    # Group by id and take the latest non NaN value
+    data = data.groupby('id').last()
 
-        # Convert string columns to float starting from the 7th column
-        for col in data.columns[6:]:
-                if data[col].dtype == 'object':
-                        data[col] = data[col].str.replace(',', '.').astype(float)
+    # Convert string columns to float starting from the 7th column
+    for col in data.columns[6:]:
+        if data[col].dtype == 'object':
+            data[col] = data[col].str.replace(',', '.').astype(float)
 
-        # Add the NLR column (dividing the number of neutrophils by the number of lymphocytes)
-        data['NLR'] = data['neutrophils count'] / data['lymphocyte count']
+    # Add the NLR column (dividing the number of neutrophils by the number of lymphocytes)
+    data['NLR'] = data['neutrophils count'] / data['lymphocyte count']
 
-        # Return the prepared dataset
-        return data
+    # Return the prepared dataset
+    return data
 
 
-def run_logistic_regressions(data, csv_path):
+def run_decisiontrees(data, biomarkers, dataframe, biomarker_name):
+    # Run the decision tree model
+    results = decision_tree(data=data, biomarkers=biomarkers)
+    # Add values to dataframe
+    dataframe.loc[len(dataframe)] = ['decision_tree', biomarker_name, *results]
+
+
+def run_logistic_regressions(data, biomarkers, dataframe, biomarker_name):
+    # Run the logistic regression model
+    results = logistic_regression(data=data, biomarkers=biomarkers)
+    # Add values to dataframe
+    dataframe.loc[len(dataframe)] = ['logistic_regression', biomarker_name, *results]
+
+
+def run_knn(data, biomarkers, knn_k_amount, dataframe, biomarker_name):
+    # Run the KNN model
+    results = knn(data=data, biomarkers=biomarkers, knn_k_amount=knn_k_amount)
+    # Add values to dataframe
+    dataframe.loc[len(dataframe)] = ['knn', biomarker_name, *results]
+
+
+def run_neural_networks(data, biomarkers, dataframe, biomarker_name):
+    # Run the neural network model
+    results = neural_network(data=data, biomarkers=biomarkers)
+    # Add values to dataframe
+    dataframe.loc[len(dataframe)] = ['neural_network', biomarker_name, *results]
+
+
+def run_xgboosts(data, biomarkers, dataframe, biomarker_name):
+    # Run the xgboost model
+    results = xgboost(data=data, biomarkers=biomarkers)
+    # Add values to dataframe
+    dataframe.loc[len(dataframe)] = ['xgboost', biomarker_name, *results]
+
+
+def main():
+    # Set location of the data
+    data_location = "data/time_series_375_preprocess_en.csv"
+
+    # Prepare the data for the DM models
+    data = prepare_data(path=data_location)
+
+    # Set the sets of biomarkers
+    # These are taken from 3 different researches, namely Ponti (2020), Semiz (2022), and Zhao (2020)
+    ponti = ['lymphocyte count', 'neutrophils count', 'Hypersensitive c-reactive protein', 'ESR', 'Interleukin 6',
+             'D-D dimer', 'NLR']
+    semiz = ['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
+             'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
+             'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR']
+    zhao = ['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte']
+
+    # Create a new DataFrame for the results
+    results_df = pd.DataFrame(columns=['model_name', 'biomarker_set', 'accuracy', 'precision', 'recall', 'f1', 'AUC'])
+
+    # Perform all of the data mining methods for each of the biomarker set:
+    # PONTI:
+    run_decisiontrees(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
+    run_logistic_regressions(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
+    run_neural_networks(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
+    run_xgboosts(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
+    run_knn(data=data, biomarkers=ponti, knn_k_amount=17, dataframe=results_df, biomarker_name='ponti')
+
+    # SEMIZ
+    run_decisiontrees(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
+    run_logistic_regressions(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
+    run_neural_networks(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
+    run_xgboosts(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
+    run_knn(data=data, biomarkers=semiz, knn_k_amount=7, dataframe=results_df, biomarker_name='semiz')
+
+    # ZHAO
+    run_decisiontrees(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
+    run_logistic_regressions(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
+    run_neural_networks(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
+    run_xgboosts(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
+    run_knn(data=data, biomarkers=zhao, knn_k_amount=25, dataframe=results_df, biomarker_name='zhao')
         
-        # Run logistic regression 3 times
-        logistic_regression_ponti_values = logistic_regression(data=data, biomarkers=['lymphocyte count', 'neutrophils count', 
-                                                                        'Hypersensitive c-reactive protein', 'ESR', 'Interleukin 6', 'D-D dimer', 'NLR'])
-
-        logistic_regression_semiz_values = logistic_regression(data=data, biomarkers=['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
-                'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
-                'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR'])
-
-        logistic_regression_zhao_values = logistic_regression(data=data, biomarkers=['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte'])
-
-        logistic_regression_all_values = logistic_regression(data=data, biomarkers="all")
-
-        # To be removedp print results
-        print("ponti lr:")
-        print(logistic_regression_ponti_values)
-        print("semiz lr:")
-        print(logistic_regression_semiz_values)
-        print("zhao lr:")
-        print(logistic_regression_zhao_values)
-        print("all lr:")
-        print(logistic_regression_all_values)
-
-        # Save the results to the CSV
-
-def run_knn(data, csv_path):
-
-        # Run logistic regression 3 times
-        knn_ponti_values = knn(data=data, 
-                               biomarkers=['lymphocyte count', 'neutrophils count', 'Hypersensitive c-reactive protein', 'ESR', 'Interleukin 6', 'D-D dimer', 'NLR'],
-                                knn_k_amount=17, 
-                                kfold_amount=10, 
-                                name="ponti")
-
-        knn_semiz_values = knn(data=data, biomarkers=['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
-                                'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
-                                'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR'], 
-                                knn_k_amount=7, 
-                                kfold_amount=10,
-                                name="semiz")
-
-        knn_zhao_values = knn(data=data, biomarkers=['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte'], 
-                                knn_k_amount=25, 
-                                kfold_amount=10,
-                                name="zhao")
-
-        knn_all_values = knn(data=data, 
-                                biomarkers="all", 
-                                knn_k_amount=29, 
-                                kfold_amount=10,
-                                name="all")
-
-        # To be removed print results
-        print("ponti knn:")
-        print(knn_ponti_values)
-        print("semiz knn:")
-        print(knn_semiz_values)
-        print("zhao knn:")
-        print(knn_zhao_values)
-        print("all knn:")
-        print(knn_all_values)
-
-        # Save the results to the CSV
-
-def run_neural_networks(data, csv_path):
-        # Get all Logistic Regression values
-        # Get all Neural Network values
-        neural_network_ponti_values = neural_network(data=data, biomarkers=['lymphocyte count', 'neutrophils count', 
-                                                                        'Hypersensitive c-reactive protein', 'ESR', 'Interleukin 6', 'D-D dimer', 'NLR'])
-
-        neural_network_semiz_values = neural_network(data=data, biomarkers=['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
-                'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
-                'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR'])
-
-        neural_network_zhao_values = neural_network(data=data, biomarkers=['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte'])
-
-        neural_network_all_values = neural_network(data=data, biomarkers="all")
-
-        print("ponti_neural_network:")
-        print(neural_network_ponti_values)
-        print("semiz_neural_network:")
-        print(neural_network_semiz_values)
-        print("zhao_neural_network:")
-        print(neural_network_zhao_values)
-        print("all_neural_network:")
-        print(neural_network_all_values)
-
-
-def run_xgboosts(data, csv_path):
-         # Get all XgBoost (decision trees) values
-        xgboost_ponti_values = xgboost(data=data, biomarkers=['lymphocyte count', 'neutrophils count', 
-                                                                        'Hypersensitive c-reactive protein', 'ESR', 'Interleukin 6', 'D-D dimer', 'NLR'])
-
-        xgboost_semiz_values = xgboost(data=data, biomarkers=['Hypersensitive c-reactive protein', 'procalcitonin', 'Interleukin 6',
-                'lymphocyte count', 'neutrophils count', 'D-D dimer', 'ferritin', 'Red blood cell distribution width ',
-                'aspartate aminotransferase', 'glutamic-pyruvic transaminase', 'Total bilirubin', 'albumin', 'NLR'])
-
-        xgboost_zhao_values = xgboost(data=data, biomarkers=['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte'])
-
-        xgboost_all_values = xgboost(data=data, biomarkers="all")
-        
-        print("ponti_xgboost:")
-        print(xgboost_ponti_values)
-        print("semiz_xgboost:")
-        print(xgboost_semiz_values)
-        print("zhao_xgboost:")
-        print(xgboost_zhao_values)
-        print("all_xgboost:")
-        print(xgboost_all_values)
+    # Place the results in a CSV file    
+    results_df.to_csv('results.csv', index=False)
 
 
 if __name__ == "__main__":
-        
-        # Set location of the data
-        data_location = "data/time_series_375_preprocess_en.csv"
-
-        # Prepare the data for the DM models
-        data = prepare_data(path=data_location)
-        
-        # Create a new CSV file for the results
-        
-        # Perform all of the data mining methods
-        run_logistic_regressions(data=data, csv_path=None)
-        run_neural_networks(data=data, csv_path=None)
-        run_xgboosts(data=data, csv_path=None)
-        run_knn(data=data, csv_path=None)
+    main()
