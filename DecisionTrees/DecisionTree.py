@@ -26,7 +26,7 @@ def decision_tree(data, biomarkers):
     model.fit(X_imputed, y)
 
     # Initialize KFold
-    kf = KFold(n_splits=5, shuffle=True, random_state=41)
+    kf = KFold(n_splits=10, shuffle=True)
 
     # Perform cross-validation
     cv_scores_acc = cross_val_score(model, X_imputed, y, cv=kf, scoring='accuracy')

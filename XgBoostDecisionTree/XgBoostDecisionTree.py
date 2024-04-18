@@ -24,7 +24,7 @@ def xgboost(data, biomarkers):
     xgb_model = xgb.XGBClassifier()
 
     # Initialize StratifiedKFold
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=10, shuffle=True)
 
     # Cross-validation using StratifiedKFold
     cv_acc = cross_val_score(xgb_model, X_imputed, y, cv=kf, scoring='accuracy')

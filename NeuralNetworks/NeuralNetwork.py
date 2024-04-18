@@ -34,7 +34,7 @@ def neural_network(data, biomarkers):
     num_epochs = 50
 
     # Define K-fold cross-validation
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=10, shuffle=True)
 
     # Initialize lists to store evaluation metrics
     cv_accuracy = []

@@ -27,7 +27,7 @@ def logistic_regression(data, biomarkers):
     X_scaled = scaler.fit_transform(X_imputed)
 
     # Initialize KFold
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=10, shuffle=True)
 
     # Build the logistic regression model
     model = LogisticRegression()
