@@ -85,25 +85,26 @@ def main():
 
     # Perform all of the data mining methods for each of the biomarker set:
     # PONTI:
-    run_decisiontrees(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
-    run_logistic_regressions(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
-    run_neural_networks(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
-    run_xgboosts(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
-    run_knn(data=data, biomarkers=ponti, knn_k_amount=17, dataframe=results_df, biomarker_name='ponti')
+    for i in range(5):
+        run_decisiontrees(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
+        run_logistic_regressions(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
+        run_neural_networks(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
+        run_xgboosts(data=data, biomarkers=ponti, dataframe=results_df, biomarker_name='ponti')
+        run_knn(data=data, biomarkers=ponti, knn_k_amount=17, dataframe=results_df, biomarker_name='ponti')
 
-    # SEMIZ
-    run_decisiontrees(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
-    run_logistic_regressions(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
-    run_neural_networks(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
-    run_xgboosts(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
-    run_knn(data=data, biomarkers=semiz, knn_k_amount=7, dataframe=results_df, biomarker_name='semiz')
+        # SEMIZ
+        run_decisiontrees(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
+        run_logistic_regressions(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
+        run_neural_networks(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
+        run_xgboosts(data=data, biomarkers=semiz, dataframe=results_df, biomarker_name='semiz')
+        run_knn(data=data, biomarkers=semiz, knn_k_amount=7, dataframe=results_df, biomarker_name='semiz')
 
-    # ZHAO
-    run_decisiontrees(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
-    run_logistic_regressions(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
-    run_neural_networks(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
-    run_xgboosts(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
-    run_knn(data=data, biomarkers=zhao, knn_k_amount=25, dataframe=results_df, biomarker_name='zhao')
+        # ZHAO
+        run_decisiontrees(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
+        run_logistic_regressions(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
+        run_neural_networks(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
+        run_xgboosts(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
+        run_knn(data=data, biomarkers=zhao, knn_k_amount=25, dataframe=results_df, biomarker_name='zhao')
         
     # Place the results in a CSV file    
     results_df.to_csv('results.csv', index=False)
