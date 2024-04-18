@@ -104,9 +104,9 @@ def main():
         run_logistic_regressions(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
         run_neural_networks(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
         run_xgboosts(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
-        run_knn(data=data, biomarkers=zhao, knn_k_amount=25, dataframe=results_df, biomarker_name='zhao')
+        run_knn(data=data, biomarkers=zhao, knn_k_amount=13, dataframe=results_df, biomarker_name='zhao')
         
-    # Place the results in a CSV file    
+    # Place the results in a CSV file
     results_df.to_csv('results.csv', index=False)
 
 
