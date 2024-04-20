@@ -27,11 +27,11 @@ def neural_network(data, biomarkers):
     X_scaled = scaler.fit_transform(X_imputed)
 
     # Define hyperparameters
-    num_neurons_layer1 = 64
-    num_neurons_layer2 = 32
-    learning_rate = 0.005
-    batch_size = 30
-    num_epochs = 50
+    num_neurons_layer1 = 32
+    num_neurons_layer2 = 64
+    learning_rate = 0.009928553629858764
+    batch_size = 32
+    num_epochs = 150
 
     # Define K-fold cross-validation
     kf = KFold(n_splits=10, shuffle=True)
