@@ -1,11 +1,9 @@
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split, cross_val_score, KFold
-import matplotlib.pyplot as plt
-from sklearn import tree
+from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict, KFold
+from sklearn.metrics import confusion_matrix, roc_auc_score
 import numpy as np
 from sklearn.impute import SimpleImputer
-
 
 def decision_tree(data, biomarkers):
     
@@ -23,24 +21,23 @@ def decision_tree(data, biomarkers):
 
     # Fit decision tree model
     model = DecisionTreeClassifier()
-    model.fit(X_imputed, y)
-
-    # Initialize KFold
-    kf = KFold(n_splits=10, shuffle=True)
 
     # Perform cross-validation
-    cv_scores_acc = cross_val_score(model, X_imputed, y, cv=kf, scoring='accuracy')
-    cv_scores_precision = cross_val_score(model, X_imputed, y, cv=kf, scoring='precision')
-    cv_scores_recall = cross_val_score(model, X_imputed, y, cv=kf, scoring='recall')
-    cv_scores_f1 = cross_val_score(model, X_imputed, y, cv=kf, scoring='f1')
-    cv_scores_auc = cross_val_score(model, X_imputed, y, cv=kf, scoring='roc_auc')
+    kf = KFold(n_splits=10, shuffle=True)
+    y_pred = cross_val_predict(model, X_imputed, y, cv=kf)
 
-    # Calculate and print mean cross-validation scores
-    mean_acc = np.mean(cv_scores_acc)
-    mean_precision = np.mean(cv_scores_precision)
-    mean_recall = np.mean(cv_scores_recall)
-    mean_f1 = np.mean(cv_scores_f1)
-    mean_auc = np.mean(cv_scores_auc)
+    # Compute confusion matrix
+    tn, fp, fn, tp = confusion_matrix(y, y_pred).ravel()
 
-    # Return accuracy, precision, recall, f1-score, and AUC
-    return mean_acc, mean_precision, mean_recall, mean_f1, mean_auc
+    # Compute AUC score
+    auc_scores = cross_val_score(model, X_imputed, y, cv=kf, scoring='roc_auc')
+    mean_auc = np.mean(auc_scores)
+
+    # Calculate mean cross-validation scores
+    mean_acc = (tp + tn) / (tp + fp + tn + fn)
+    mean_precision = tp / (tp + fp)
+    mean_recall = tp / (tp + fn)
+    mean_f1 = 2 * ((mean_precision * mean_recall) / (mean_precision + mean_recall))
+
+    # Return accuracy, precision, recall, f1-score, mean AUC, and confusion matrix totals
+    return mean_acc, mean_precision, mean_recall, mean_f1, mean_auc, tp, fp, tn, fn

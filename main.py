@@ -81,7 +81,7 @@ def main():
     zhao = ['Lactate dehydrogenase', 'Hypersensitive c-reactive protein', '(%)lymphocyte']
 
     # Create a new DataFrame for the results
-    results_df = pd.DataFrame(columns=['model_name', 'biomarker_set', 'accuracy', 'precision', 'recall', 'f1', 'AUC'])
+    results_df = pd.DataFrame(columns=['model_name', 'biomarker_set', 'accuracy', 'precision', 'recall', 'f1', 'AUC', 'TP', 'FP', 'TN', 'FN'])
 
     # Perform all of the data mining methods for each of the biomarker set:
     # PONTI:
@@ -106,9 +106,10 @@ def main():
         run_xgboosts(data=data, biomarkers=zhao, dataframe=results_df, biomarker_name='zhao')
         run_knn(data=data, biomarkers=zhao, knn_k_amount=13, dataframe=results_df, biomarker_name='zhao')
         
+        print(i)
+        
     # Place the results in a CSV file
-    results_df.to_csv('results2.csv', index=False)
-
+    results_df.to_csv('results_with_classification_matrix.csv', index=False)
 
 if __name__ == "__main__":
     main()

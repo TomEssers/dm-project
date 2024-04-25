@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import cross_val_score, KFold
+from sklearn.model_selection import cross_val_predict, KFold, cross_val_score
+from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.impute import SimpleImputer
 
 def knn(data, biomarkers, knn_k_amount):
@@ -32,19 +33,21 @@ def knn(data, biomarkers, knn_k_amount):
     # Initialize KFold
     kf = KFold(n_splits=10, shuffle=True)
 
-    # Perform k-fold cross-validation manually
-    cv_scores_acc = cross_val_score(classifier, X_scaled, y, cv=kf, scoring='accuracy')
-    cv_scores_precision = cross_val_score(classifier, X_scaled, y, cv=kf, scoring='precision')
-    cv_scores_recall = cross_val_score(classifier, X_scaled, y, cv=kf, scoring='recall')
-    cv_scores_f1 = cross_val_score(classifier, X_scaled, y, cv=kf, scoring='f1')
-    cv_scores_auc = cross_val_score(classifier, X_scaled, y, cv=kf, scoring='roc_auc')
+    # Perform k-fold cross-validation
+    y_pred = cross_val_predict(classifier, X_scaled, y, cv=kf)
 
-    # Calculate and print mean cross-validation scores
-    mean_acc = np.mean(cv_scores_acc)
-    mean_precision = np.mean(cv_scores_precision)
-    mean_recall = np.mean(cv_scores_recall)
-    mean_f1 = np.mean(cv_scores_f1)
-    mean_auc = np.mean(cv_scores_auc)
-    
-    # Return accuracy, precision, recall, f1-score, and AUC
-    return mean_acc, mean_precision, mean_recall, mean_f1, mean_auc
+    # Compute confusion matrix
+    tn, fp, fn, tp = confusion_matrix(y, y_pred).ravel()
+
+    # Compute AUC score
+    auc_scores = cross_val_score(classifier, X_scaled, y, cv=kf, scoring='roc_auc')
+    mean_auc = np.mean(auc_scores)
+
+    # Calculate mean cross-validation scores
+    mean_acc = (tp + tn) / (tp + fp + tn + fn)
+    mean_precision = tp / (tp + fp)
+    mean_recall = tp / (tp + fn)
+    mean_f1 = 2 * ((mean_precision * mean_recall) / (mean_precision + mean_recall))
+
+    # Return accuracy, precision, recall, f1-score, mean AUC, and confusion matrix totals
+    return mean_acc, mean_precision, mean_recall, mean_f1, mean_auc, tp, fp, tn, fn

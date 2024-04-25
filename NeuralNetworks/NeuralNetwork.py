@@ -3,7 +3,7 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 import tensorflow as tf
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 
 def neural_network(data, biomarkers):
 
@@ -31,7 +31,7 @@ def neural_network(data, biomarkers):
     num_neurons_layer2 = 64
     learning_rate = 0.009928553629858764
     batch_size = 32
-    num_epochs = 150
+    num_epochs = 50
 
     # Define K-fold cross-validation
     kf = KFold(n_splits=10, shuffle=True)
@@ -42,6 +42,12 @@ def neural_network(data, biomarkers):
     cv_recall = []
     cv_f1_score = []
     cv_auc = []
+
+    # Initialize lists to store TP, FP, TN, FN
+    cv_tp = []
+    cv_fp = []
+    cv_tn = []
+    cv_fn = []
 
     # Build the neural network model
     model = tf.keras.Sequential([
@@ -65,10 +71,19 @@ def neural_network(data, biomarkers):
         model.fit(X_train, y_train, epochs=num_epochs, batch_size=batch_size, verbose=0)
 
         # Predict probabilities
-        y_pred_prob = model.predict(X_test)
+        y_pred_prob = model.predict(X_test, verbose=0)
 
         # Threshold probabilities to get predicted classes
         y_pred = (y_pred_prob > 0.5).astype(int)
+
+        # Calculate confusion matrix components
+        tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+
+        # Append confusion matrix components to lists
+        cv_tp.append(tp)
+        cv_fp.append(fp)
+        cv_tn.append(tn)
+        cv_fn.append(fn)
 
         # Calculate evaluation metrics
         accuracy = accuracy_score(y_test, y_pred)
@@ -91,4 +106,9 @@ def neural_network(data, biomarkers):
     mean_f1_score = np.mean(cv_f1_score)
     mean_auc = np.mean(cv_auc)
 
-    return mean_accuracy, mean_precision, mean_recall, mean_f1_score, mean_auc
+    sum_tp = np.sum(cv_tp)
+    sum_fp = np.sum(cv_fp)
+    sum_tn = np.sum(cv_tn)
+    sum_fn = np.sum(cv_fn)
+
+    return mean_accuracy, mean_precision, mean_recall, mean_f1_score, mean_auc, sum_tp, sum_fp, sum_tn, sum_fn
